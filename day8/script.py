@@ -19,29 +19,26 @@ instructions=[]
 
 accumulator = 0
 
-#runinstructions=[]
-
-def run_code(part,accumulator,instruction_set,runinstructions):
+def run_code(part,accumulator,instruction_set,completed_instructions):
 	#run code
-	#print("starting accumulator",accumulator)
 	i = 0
 	while i < len(instruction_set):
-		if i in runinstructions:
-			#if next instruction has already been ran, return accumulator
+		if i in completed_instructions:
+			#if next instruction has already been ran, print accumulator
 			if part == 1:
-				print("Hit repeat. accumulator = ",accumulator)
 				print("Part 1 : ",accumulator)
-			if part == 2:
-				print("Hit repeat. accumulator = ",accumulator)
-			accumulator = 0
+				return 0
 			return 0
 		else:
 			#add instruction to the list of those that have run
-			runinstructions.append(i)
+			completed_instructions.append(i)
 			#print("Step",i," Running",instruction_set[i]["op"],instruction_set[i]["arg"]["operator"],instruction_set[i]["arg"]["int"],"accumulator = ",accumulator)
 			if instruction_set[i]["op"] == "nop":
 				#no operation
 				i +=1
+				#if going to go outside of bounds of list, return the accumulator
+				if i + 1 > len(instruction_set):
+						return(accumulator)
 				continue
 			if instruction_set[i]["op"] == "acc":
 				#do math on accumulator
@@ -54,17 +51,35 @@ def run_code(part,accumulator,instruction_set,runinstructions):
 					#subtraction
 					accumulator -= int(instruction_set[i]["arg"]["int"])
 					i += 1
-				print("accumulator = ",accumulator)
+				#if going to go outside of bounds of list, return the accumulator
+				if i + 1 > len(instruction_set):
+						return(accumulator)
 				continue
 			if instruction_set[i]["op"] == "jmp":
 				#do math on jmper
 				if instruction_set[i]["arg"]["operator"] == "+":
 					#posi jump
 					i += int(instruction_set[i]["arg"]["int"])
+					#if going to go outside of bounds of list, return the accumulator
+					if i +1 > len(instruction_set):
+						return(accumulator)
 				else:
 					#negi jump
 					i -= int(instruction_set[i]["arg"]["int"])
 				continue
+
+def nop_jmp_swap(nopsorjmps,modified_instructions,original,swapped):
+	for n in nopsorjmps:
+		#reset accumulator and modified instrucitons
+		accumulator = 0
+		modified_instructions = instructions.copy()
+		#replace nop with jmp
+		modified_instructions[n]['op'] = swapped
+		if(run_code(2,accumulator,modified_instructions,[])) != 0:
+			print("Part 2: ",run_code(2,accumulator,modified_instructions,[]))
+			break
+		#switch it back
+		modified_instructions[n]['op'] = original
 
 
 with open(sys.argv[1]) as f:
@@ -76,58 +91,21 @@ with open(sys.argv[1]) as f:
 		argument["int"] = l.split(" ")[1][1:]
 		instruction["arg"] = argument.copy()
 		instructions.append(instruction.copy())
-
-	jmpmodinstructions = instructions.copy()
-	modinstructions = instructions.copy()
 	
 	#for part 1
 	run_code(1,accumulator,instructions,[])
 
 	nops = []
 	jmps = []
-	print(instructions)
+	
+	#build list of nops and jmps
 	for i in range(len(instructions)):
 		if instructions[i]["op"] == "jmp":
 			jmps.append(i)
 		if instructions[i]["op"] == "nop":
 			nops.append(i)
-	print("nop count = ",len(nops))
-	print(nops)
-	print("jmp count = ",len(jmps))
-	print(jmps)
-
-	#bruteforce jumps and no ops and add ones that break to these lists. 
-	brokenjmps = []
-	brokennops = []
-
 	
-	for n in nops:
-		#print("Swapping instruction[",n,"]nop with jmp")
-		#reset accumulator and modified instrucitons
-		accumulator = 0
-		jmpmodinstructions = instructions.copy()
-		#replace nop with jmp
-		jmpmodinstructions[n]['op'] = "jmp"
-		if(run_code(2,accumulator,jmpmodinstructions,[])) != 0:
-			print("The code ran completely. accumulator = ",accumulator)
-		#switch it back
-		jmpmodinstructions[n]['op'] = "nop"
-	
-	for j in jmps:
-		#print(modinstructions)
-		#print("Swapping instruction[",j,"]jmp with nop")
-		#reset accumulator and modified instrucitons
-		accumulator = 0
-		#print("resetting mod instructions")
-		modinstructions = instructions.copy()
-		#print("Before: ",modinstructions[j]['op'])
-		#replace jmp with nop
-		modinstructions[j]['op'] = "nop"
-		#print("After: ",modinstructions[j]['op'])
-		if(run_code(2,accumulator,modinstructions,[])) != 0:
-			print("The code ran completely. accumulator = ",accumulator)
-		modinstructions[j]['op'] = "jmp"
+	#swap the jmps and nops until you find the swap that doesn't infinitely loop
+	nop_jmp_swap(nops,instructions,"nop","jmp")
+	nop_jmp_swap(jmps,instructions,"jmp","nop")
 
-	print("Done.")
-
-#0

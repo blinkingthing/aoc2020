@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import sys
+#import pdb
+
 
 if len(sys.argv) != 2:
     print("usage: solve.py input.txt")
@@ -70,6 +72,7 @@ def run_code(part,accumulator,instruction_set,completed_instructions):
 
 def nop_jmp_swap(nopsorjmps,modified_instructions,original,swapped):
 	for n in nopsorjmps:
+		#pdb.set_trace()
 		#reset accumulator and modified instrucitons
 		accumulator = 0
 		modified_instructions = instructions.copy()

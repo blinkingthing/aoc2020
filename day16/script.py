@@ -51,19 +51,32 @@ with open(sys.argv[1]) as f:
 		#print(value)
 	print(fields)
 
-	all_tickets = list(set(all_tickets))
-	all_fields = list(set(all_fields))
+	#all_tickets = list(set(all_tickets))
+	#all_fields = list(set(all_fields))
 	
-	print("part 1 tickets : ",all_tickets)
-	print("part 1 valid fields : ",all_fields)
+	#print("part 1 tickets : ",all_tickets)
+	#print("part 1 valid fields : ",all_fields)
 	# differences = numpy.setdiff1d(all_tickets,all_fields)
 	# print("part 1 differences : ",differences)
 	# sumofdifferences = 0
 	# for d in differences:
 	# 	sumofdifferences += d
 	# p1 = sumofdifferences
-	diff =[]
 	
+	##PART 1 lesson learned - read the prompt - I was checking for differences between all the tickets and the fields, should've only been checking nearby tickets
+
+	diff = 0
+	differences = []
+	for i in nearbytickets:
+		if i not in all_fields:
+			diff += i
+			differences.append(i)
+			nearbytickets.remove(i)
+	print("invalid tickets :",differences)
+	print(diff)
+	p1 = diff
+	
+	validnearby = nearbytickets
 
 
 print("Part 1:",p1)

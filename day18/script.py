@@ -58,28 +58,76 @@ with open(sys.argv[1]) as f:
 			return(int(equation[0]) + int(equation[2]))
 	
 
-	def solve_from_left(equation):
+	def solve_from_left(equation,method):
 		#strip parenthesis if they exist
 		if equation[0] == "(":
 			equation = equation[1:-1]
-		#print("** Length of equation to be solved = ",len(equation))
-		#get first 2 digits + operator and solve
-		first_three = equation[:3]
-		#print("solve from left: ",equation)
-		#print(first_three)
-		#remove first_three from equation
-		leftovers = []
-		leftovers = equation[3:]
-		#print("leftovers : ",leftovers)
-		reduced = []
-		reduced.append(simplesolve(first_three))
-		#print("reduced after simplesolve : ",reduced)
-		for l in leftovers:
-			reduced.append(l)
-		return reduced if len(reduced) == 1 else solve_from_left(reduced)
+		#standard method, from left to right
+		if method == 0:
+			#print("** Length of equation to be solved = ",len(equation))
+			#get first 2 digits + operator and solve
+			first_three = equation[:3]
+			#print("solve from left: ",equation)
+			#print(first_three)
+			#remove first_three from equation
+			leftovers = []
+			leftovers = equation[3:]
+			#print("leftovers : ",leftovers)
+			reduced = []
+			reduced.append(simplesolve(first_three))
+			#print("reduced after simplesolve : ",reduced)
+			for l in leftovers:
+				reduced.append(l)
+		#part 2 method, left to right, addition before multiplication
+		if method == 1:
+			#if there are remaining additions
+			if equation.count("+") > 0:
+				leftmost_addition = []
+				leftmost_add_loc = 0
+				for i,e in enumerate(equation):
+					if e =="+":
+						leftmost_add_loc = i
+						leftmost_addition.append(equation[i-1])
+						leftmost_addition.append(equation[i])
+						leftmost_addition.append(equation[i+1])
+						break
+				print(leftmost_addition)
+				print(simplesolve(leftmost_addition))
+				#get first 2 digits + operator and solve
+				equation[leftmost_add_loc-1] = simplesolve(leftmost_addition)
+				#pop remaining two parts of original equation
+				equation.pop(leftmost_add_loc)
+				equation.pop(leftmost_add_loc)
+				print(equation)
+				
+				#print("leftovers : ",leftovers)
+				reduced = equation
+			#else do multiplications
+			else:
+				leftmost_multiplication = []
+				leftmost_multiply_loc = 0
+				for i,e in enumerate(equation):
+					if e =="*":
+						leftmost_multiply_loc = i
+						leftmost_multiplication.append(equation[i-1])
+						leftmost_multiplication.append(equation[i])
+						leftmost_multiplication.append(equation[i+1])
+						break
+				print(leftmost_multiplication)
+				print(simplesolve(leftmost_multiplication))
+				#get first 2 digits + operator and solve
+				equation[leftmost_multiply_loc-1] = simplesolve(leftmost_multiplication)
+				#pop remaining two parts of original equation
+				equation.pop(leftmost_multiply_loc)
+				equation.pop(leftmost_multiply_loc)
+				print(equation)
+				reduced = equation
+		
+		
+		return reduced if len(reduced) == 1 else solve_from_left(reduced,method)
 
 
-	def reduceparenthesis(inputequation):
+	def reduceparenthesis(inputequation,method):
 		parenthesis = checkforparenthesis(inputequation)
 		#print(parenthesis)
 		#location of first parenthesis to reduce
@@ -87,7 +135,7 @@ with open(sys.argv[1]) as f:
 		#print("starting parenthesis location",starting_parenethesis)
 		unreduced = leftmost_p_contents(inputequation,starting_parenethesis)
 		#print("unreduced :", unreduced[0])
-		reduced = solve_from_left(unreduced[0])
+		reduced = solve_from_left(unreduced[0],method)
 		#print("reduced : ", reduced)
 		start_of_replacement = unreduced[1]-(len(unreduced[0])-1)
 		#print("start of section to be replaced :",start_of_replacement)
@@ -100,7 +148,7 @@ with open(sys.argv[1]) as f:
 			inputequation.pop(start_of_replacement+1)
 		#print(inputequation)
 		parenthesis = checkforparenthesis(inputequation)
-		return inputequation if len(parenthesis) == 0 else reduceparenthesis(inputequation)
+		return inputequation if len(parenthesis) == 0 else reduceparenthesis(inputequation,method)
 
 
 	def solveequation(inputequation):
@@ -116,10 +164,10 @@ with open(sys.argv[1]) as f:
 		if len(checkforparenthesis(inputequation)) > 0:
 			#parenthesis exist, reduce parenthesis
 			#print("yes parenthesis")
-			answer = solve_from_left(reduceparenthesis(equation_nospaces))[0]
+			answer = solve_from_left(reduceparenthesis(equation_nospaces,0),0)[0]
 		else:
 			#no parenthesis
-			answer = solve_from_left(equation_nospaces)[0]
+			answer = solve_from_left(equation_nospaces,0)[0]
 		return(answer)
 
 	answers = []
@@ -130,6 +178,33 @@ with open(sys.argv[1]) as f:
 	print(answers)
 	p1 = sum(answers)
 	
+	def solveequation2(inputequation):
+		#print("checking : ",inputequation)
+		#remove spaces
+		equation_nospaces= []
+		for i in inputequation:
+			if i == ' ':
+				continue
+			else:
+				equation_nospaces.append(i)
+		print(equation_nospaces)
+		if len(checkforparenthesis(inputequation)) > 0:
+			#parenthesis exist, reduce parenthesis
+			#print("yes parenthesis")
+			answer = solve_from_left(reduceparenthesis(equation_nospaces,1),1)[0]
+		else:
+			#no parenthesis
+			answer = solve_from_left(equation_nospaces,1)[0]
+		return(answer)
+	print("part2")
+
+	answers = []
+	for i in range(len(inputlist)):
+		print(solveequation2(inputlist[i]))
+		answers.append(solveequation2(inputlist[i]))
+	
+	print(answers)
+	p2 = sum(answers)
 
 
 

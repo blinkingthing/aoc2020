@@ -11,11 +11,7 @@ p2 = 0
 
 with open(sys.argv[1]) as f:
 	inputlist = f.read().splitlines()
-	
-	#for line in inputlist:
-	#	print(line)
 
-	
 	def checkforparenthesis(tocheck):
 		parenthesis = []
 		for c in tocheck:
@@ -91,14 +87,14 @@ with open(sys.argv[1]) as f:
 						leftmost_addition.append(equation[i])
 						leftmost_addition.append(equation[i+1])
 						break
-				print(leftmost_addition)
-				print(simplesolve(leftmost_addition))
+				#print(leftmost_addition)
+				#print(simplesolve(leftmost_addition))
 				#get first 2 digits + operator and solve
 				equation[leftmost_add_loc-1] = simplesolve(leftmost_addition)
 				#pop remaining two parts of original equation
 				equation.pop(leftmost_add_loc)
 				equation.pop(leftmost_add_loc)
-				print(equation)
+				#print(equation)
 				
 				#print("leftovers : ",leftovers)
 				reduced = equation
@@ -113,14 +109,14 @@ with open(sys.argv[1]) as f:
 						leftmost_multiplication.append(equation[i])
 						leftmost_multiplication.append(equation[i+1])
 						break
-				print(leftmost_multiplication)
-				print(simplesolve(leftmost_multiplication))
+				#print(leftmost_multiplication)
+				#print(simplesolve(leftmost_multiplication))
 				#get first 2 digits + operator and solve
 				equation[leftmost_multiply_loc-1] = simplesolve(leftmost_multiplication)
 				#pop remaining two parts of original equation
 				equation.pop(leftmost_multiply_loc)
 				equation.pop(leftmost_multiply_loc)
-				print(equation)
+				#print(equation)
 				reduced = equation
 		
 		
@@ -151,7 +147,7 @@ with open(sys.argv[1]) as f:
 		return inputequation if len(parenthesis) == 0 else reduceparenthesis(inputequation,method)
 
 
-	def solveequation(inputequation):
+	def solveequation(inputequation,method):
 		#print("checking : ",inputequation)
 		#remove spaces
 		equation_nospaces= []
@@ -160,50 +156,33 @@ with open(sys.argv[1]) as f:
 				continue
 			else:
 				equation_nospaces.append(i)
-		print(equation_nospaces)
+		#print(equation_nospaces)
 		if len(checkforparenthesis(inputequation)) > 0:
 			#parenthesis exist, reduce parenthesis
 			#print("yes parenthesis")
-			answer = solve_from_left(reduceparenthesis(equation_nospaces,0),0)[0]
+			answer = solve_from_left(reduceparenthesis(equation_nospaces,method),method)[0]
 		else:
 			#no parenthesis
-			answer = solve_from_left(equation_nospaces,0)[0]
+			answer = solve_from_left(equation_nospaces,method)[0]
 		return(answer)
 
 	answers = []
 	for i in range(len(inputlist)):
-		print(solveequation(inputlist[i]))
-		answers.append(solveequation(inputlist[i]))
+		#print(solveequation(inputlist[i],0))
+		answers.append(solveequation(inputlist[i],0))
 	
-	print(answers)
+	#print(answers)
 	p1 = sum(answers)
 	
-	def solveequation2(inputequation):
-		#print("checking : ",inputequation)
-		#remove spaces
-		equation_nospaces= []
-		for i in inputequation:
-			if i == ' ':
-				continue
-			else:
-				equation_nospaces.append(i)
-		print(equation_nospaces)
-		if len(checkforparenthesis(inputequation)) > 0:
-			#parenthesis exist, reduce parenthesis
-			#print("yes parenthesis")
-			answer = solve_from_left(reduceparenthesis(equation_nospaces,1),1)[0]
-		else:
-			#no parenthesis
-			answer = solve_from_left(equation_nospaces,1)[0]
-		return(answer)
-	print("part2")
+	
+	#print("part2")
 
 	answers = []
 	for i in range(len(inputlist)):
-		print(solveequation2(inputlist[i]))
-		answers.append(solveequation2(inputlist[i]))
+		#print(solveequation(inputlist[i],1))
+		answers.append(solveequation(inputlist[i],1))
 	
-	print(answers)
+	#print(answers)
 	p2 = sum(answers)
 
 
